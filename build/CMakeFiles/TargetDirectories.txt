@@ -1,3 +1,0 @@
-/home/oleh/kpi/thesis_master/code/build/CMakeFiles/rebuild_cache.dir
-/home/oleh/kpi/thesis_master/code/build/CMakeFiles/edit_cache.dir
-/home/oleh/kpi/thesis_master/code/build/CMakeFiles/gibbs_sampler.dir
