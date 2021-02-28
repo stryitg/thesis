@@ -15,6 +15,7 @@ public:
     GibbsSamplerND(const Info& info);
     
     Eigen::VectorXd Sample();
+    double SampleWithVals(const Eigen::VectorXd& vals, size_t pos);
     
 private:
     std::vector<Eigen::VectorXd> ComputeConditionalDists() const;

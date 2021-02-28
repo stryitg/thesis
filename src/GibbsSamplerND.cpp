@@ -48,6 +48,14 @@ void GibbsSamplerND::RemoveColumn(Eigen::MatrixXd& matrix, int64_t i) const {
     matrix.conservativeResize(new_rows,new_cols);
 }
 
+double GibbsSamplerND::SampleWithVals(const Eigen::VectorXd& vals, size_t pos) {
+    m_vector = vals;
+    const auto u = GetU(pos);
+    const auto s = GetS(pos);
+    // std::cout << u << std::endl;
+    return SampleND(u, s);
+}
+
 
 Eigen::VectorXd GibbsSamplerND::Sample() {
     m_vector = m_u;

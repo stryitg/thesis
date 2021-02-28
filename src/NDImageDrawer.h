@@ -1,32 +1,32 @@
 #pragma once
 
 #include <NormalDistribution.h>
+#include <Rect.h>
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 class NDImageDrawer {
 public:
-    struct Options {
+    struct Info {
+        
+        
         NormalDist nd;
-        size_t w;
-        size_t h;
-        size_t r_w;
-        size_t r_h;
+        Rect shape;
+        Tiling tiling;
     };
     
-    NDImageDrawer(const Options& opt);
+    NDImageDrawer(const Info& opt);
     
-    cv::Mat Draw() const;
+    cv::Mat Draw(size_t iter) const;
 
 private:
+    cv::Mat GenerateRandomFromDist() const;
+    void UpdateWithGibbsSampling(cv::Mat& img) const;
+    Eigen::VectorXd GetNeighbors(const cv::Mat& img, size_t i, size_t j) const;
     Eigen::VectorXd SamplePixels() const;
     uint8_t ToImageColour(double v) const;
 
 private:
-    NormalDist m_nd;
-    size_t m_w;
-    size_t m_h;
-    size_t m_r_w;
-    size_t m_r_h;
+    Info m_info;
 };
