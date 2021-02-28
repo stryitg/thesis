@@ -24,7 +24,7 @@ cv::Mat NDImageDrawer::Draw() const {
                 }
             }
             if (c % 10 == 0) {
-                LOG("Written " << c);
+                std::cout << "Written " << c << std::endl;
             }
                 
             ++c;
@@ -34,7 +34,7 @@ cv::Mat NDImageDrawer::Draw() const {
 }
 
 Eigen::VectorXd NDImageDrawer::SamplePixels() const {
-    GibbsSamplerND sampler({.nd = m_nd, .iter = 10000});
+    GibbsSamplerND sampler({.nd = m_nd, .iter = 10});
     return sampler.Sample();
 }
 

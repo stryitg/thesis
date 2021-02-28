@@ -41,23 +41,21 @@ Eigen::VectorXd ImageAsND::GetNDVector(int i, int j) const {
 }
 
 Eigen::VectorXd ImageAsND::EstimateU(const std::vector<Eigen::VectorXd>& vs) const {
-    LOG("Estimating avg");
+    std::cout << "Estimating avg" << std::endl;
     Eigen::VectorXd m = Eigen::VectorXd::Zero(vs[0].rows());
     for (const auto v : vs) {
         m += v;
     }
-    LOG("Done Estimating avg");
+    std::cout << "Done Estimating avg" << std::endl;
     return m / vs.size();
 }
 
 Eigen::MatrixXd ImageAsND::EstimateS(const std::vector<Eigen::VectorXd>& vs, const Eigen::VectorXd& u) const {
-    LOG("Estimating sigma");
+    std::cout << "Estimating sigma" << std::endl;
     Eigen::MatrixXd m = Eigen::ArrayXXd::Zero(vs[0].rows(), vs[0].rows());
     for (const auto v : vs) {
         m += (v - u) * (v - u).transpose();
     }
-    LOG("Done Estimating sigma");
-    const auto es = m.eigenvalues();
-    LOG(es);
+    std::cout << "Done Estimating sigma" << std::endl;
     return m / (vs.size() - 1);
 }
