@@ -8,8 +8,13 @@ NDImageDrawer::NDImageDrawer(const Info& info)
 
 cv::Mat NDImageDrawer::Draw(size_t iter) const {
     cv::Mat img = GenerateRandomFromDist();
+    cv::imshow("result", img);
+    cv::waitKey();
     for (size_t i = 0; i < iter; ++i) {
+        std::cout << i << std::endl;
         UpdateWithGibbsSampling(img);
+        cv::imshow("result", img);
+        cv::waitKey();
     }
     return img;
 }
@@ -39,14 +44,41 @@ cv::Mat NDImageDrawer::GenerateRandomFromDist() const {
 
 void NDImageDrawer::UpdateWithGibbsSampling(cv::Mat& img) const {
     GibbsSamplerND sampler({.nd = m_info.nd, .iter = 0});
-    const auto pos = (2 * m_info.tiling.r_h + 1) * (2 * m_info.tiling.r_w + 1) * 3 / 2 - 1;
+    // size_t i = m_info.tiling.r_h;
+    // size_t j = m_info.tiling.r_h;
+    // const auto vals = GetNeighbors(img, i, j);
+    // std::cout << "[";
+    // for (const auto& v : vals) {
+    //     std::cout << v << ", ";
+    // }
+    // std::cout << "]" << std::endl;
+    
+    const auto pos = (2 * m_info.tiling.r_h + 1) * (2 * m_info.tiling.r_w + 1) / 2;
+    // for (size_t c = 0; c < 1; ++c) {
+    // const auto new_pixel = sampler.SampleWithVals(vals, pos);
+    // std::cout << new_pixel << std::endl;
+        // std::cout << vals[0] << " "<< vals[1] <<  " "<< vals[2] << std::endl;
+        // auto& img_val = img.at<cv::Vec3b>(static_cast<int>(0), static_cast<int>(0));
+        // // std::cout << "before: " << (int) img_val[0] << " " << (int) img_val[1] << " "  << (int) img_val[2] << std::endl;
+        // img_val[c] = ToImageColour(sampler.SampleWithVals(vals, 0)); 
+        // std::cout << "after: " << (int) img_val[0] << " "  << (int) img_val[1] << " "  << (int) img_val[2] << std::endl;
+    // }
+    // auto& img_val = img.at<cv::Vec3b>(static_cast<int>(0), static_cast<int>(0));
+    // std::cout << img_val << std::endl;
+    // std::cout << pos << std::endl;
     for (size_t i = m_info.tiling.r_h; i < m_info.shape.h - m_info.tiling.r_h; ++i) {
         for (size_t j = m_info.tiling.r_w; j < m_info.shape.w - m_info.tiling.r_w; ++j) {
+            // auto& img_val = img.at<cv::Vec3b>(static_cast<int>(i), static_cast<int>(j));
+            // std::cout << "BEFORE: " <<  img_val << std::endl;
+            const auto vals = GetNeighbors(img, i, j);
+            const auto new_pixel = sampler.SampleWithVals(vals, pos);
+            auto& img_val = img.at<cv::Vec3b>(static_cast<int>(i), static_cast<int>(j));
             for (size_t c = 0; c < 3; ++c) {
-                const auto vals = GetNeighbors(img, i, j);
-                auto& img_val = img.at<cv::Vec3b>(static_cast<int>(i), static_cast<int>(j));
-                img_val[c] = ToImageColour(sampler.SampleWithVals(vals, pos + c)); 
+                // std::cout << "before: " << (int) img_val[0] << " " << (int) img_val[1] << " "  << (int) img_val[2] << std::endl;
+                img_val[c] = ToImageColour(new_pixel[c]); 
+                // std::cout << "after: " << (int) img_val[0] << " "  << (int) img_val[1] << " "  << (int) img_val[2] << std::endl;
             }
+            // std::cout << "AFTER: " <<  img_val << std::endl;
         }
     }
 }

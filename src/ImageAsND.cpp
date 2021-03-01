@@ -36,6 +36,7 @@ Eigen::VectorXd ImageAsND::GetNDVector(size_t i, size_t j) const {
             nd_vec[count++] = val[0];
             nd_vec[count++] = val[1];
             nd_vec[count++] = val[2];
+            
         }
     }
     return nd_vec;
