@@ -19,13 +19,17 @@ GibbsSamplerND::GibbsSamplerND(const Info& info)
 // s11 s12
 // s21 s22
 std::vector<Eigen::MatrixXd> GibbsSamplerND::ComputeConditionalDists() const {
-    std::vector<Eigen::MatrixXd> cond_dists(m_u.rows());
-    for (int64_t i = 0; i < m_u.rows() / 3; ++i) {
-        const auto s22 = RemoveRowCol(m_s, i);
-        Eigen::MatrixXd s12 = m_s(Eigen::seq(i * 3, (i + 1) * 3 - 1), Eigen::all);
-        RemoveColumn(s12, i);
-        cond_dists[i] = s12 * s22.inverse();
-    }
+    std::vector<Eigen::MatrixXd> cond_dists(m_u.rows() / 3);
+    const auto i = m_u.rows() / 3 / 2;
+    // for (int64_t i = 0; i < m_u.rows() / 3; ++i) {
+    const auto s22 = RemoveRowCol(m_s, i);
+    Eigen::MatrixXd s12 = m_s(Eigen::seq(i * 3, (i + 1) * 3 - 1), Eigen::all);
+    // if (i == 4)
+    //     std::cout << s12 << std::endl;
+    RemoveColumn(s12, i);
+    cond_dists[0] = s12 * s22.inverse();
+    // std::cout << cond_dists[0] << std::endl;
+    // }
     return cond_dists;
 }
 
@@ -59,8 +63,10 @@ Eigen::VectorXd GibbsSamplerND::SampleWithVals(const Eigen::VectorXd& vals, size
     m_vector = vals;
     const auto u = GetU(pos);
     // std::cout << u << std::endl;
+    // std::cout << std::endl;
     const auto s = GetS(pos);
     // std::cout << s << std::endl;
+    // std::cout << std::endl;
     NDSampler sampler({.u = u, .s = s});
     return sampler.Sample();
 }
@@ -86,14 +92,14 @@ Eigen::VectorXd GibbsSamplerND::GetU(int64_t i) const {
     using namespace Eigen;
     const auto vector = GetVectorWithoutI(m_vector, i);
     const auto u_small = GetVectorWithoutI(m_u, i);
-    return m_u(seq((i * 3), (i + 1) * 3 - 1)) + m_cond_dists[i] * (vector - u_small);
+    return m_u(seq((i * 3), (i + 1) * 3 - 1)) + m_cond_dists[0] * (vector - u_small);
 }
 
 Eigen::MatrixXd GibbsSamplerND::GetS(int64_t i) const {
     using namespace Eigen;
     Eigen::MatrixXd s21 = m_s(Eigen::all, Eigen::seq(i * 3, (i + 1) * 3 - 1));
     RemoveRow(s21, i);
-    return m_s(seq(i * 3, (i + 1) * 3 - 1), seq(i * 3, (i + 1) * 3 - 1)) - m_cond_dists[i] * s21;
+    return m_s(seq(i * 3, (i + 1) * 3 - 1), seq(i * 3, (i + 1) * 3 - 1)) - m_cond_dists[0] * s21;
 }
 
 Eigen::VectorXd GibbsSamplerND::GetVectorWithoutI(Eigen::VectorXd vector, int64_t i) const {
